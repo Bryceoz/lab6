@@ -47,13 +47,23 @@ def controller(turtlebot_frame, goal_frame):
       trans = tfBuffer.lookup_transform(turtlebot_frame, goal_frame, rospy.Time())
 
       # Process trans to get your state error
+      x = trans.tranform.translation.x
+      y = trans.transform.translation.y
+
+      K = np.array([[K1, 0],
+      				[0, K2]])
+     
       # Generate a control command to send to the robot
 
-      control_command = # Generate this
+      q = np.array([[x],
+      				[y]])
+      control_command = np.dot(K,q) # Generate this
 
       #################################### end your code ###############
-
-      pub.publish(control_command)
+      twist_pub = Twist()
+      twist_pub.linear.x = control_command[0]
+      twist_pub.linear.y = control_command[1]
+      pub.publish(twist_pub)
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
       pass
     # Use our rate object to sleep until it is time to publish again
